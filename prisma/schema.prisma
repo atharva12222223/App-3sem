@@ -1,0 +1,136 @@
+// Street Vendor Digital Registry — Prisma schema
+// Datasource defaults to SQLite for local dev; switch provider to
+// "postgresql" (and update DATABASE_URL) for production deployments.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────── Vendor ───────────────────────────
+
+model Vendor {
+  phone              String   @id // E.164 without '+', e.g. "919876543210"
+  name               String
+  nameVernacular     String?  // Name in local script (हिन्दी, ಕನ್ನಡ, मराठी…)
+  category           String   // FOOD | VEGETABLES | CLOTHING | FLOWERS | CHAAT …
+  zoneId             String?
+  zone               VendingZone? @relation(fields: [zoneId], references: [id])
+  verificationStatus String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  rejectionReason    String?
+  upiId              String?  // e.g. "9876543210@ybl"
+  lat                Float?
+  lng                Float?
+  rating             Float    @default(0) // denormalized average of reviews
+  ratingCount        Int      @default(0)
+  dutyActive         Boolean  @default(false) // live-location sharing toggle
+  lastPingAt         DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  documents Document[]
+  reviews   Review[]
+  favoritedBy Favorite[]
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  vendorPhone String
+  vendor      Vendor   @relation(fields: [vendorPhone], references: [phone], onDelete: Cascade)
+  type        String   // AADHAAR | FSSAI | MUNICIPAL_CERT
+  fileUrl     String   // object-storage URL / local upload path
+  status      String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  uploadedAt  DateTime @default(now())
+
+  @@unique([vendorPhone, type])
+}
+
+// ─────────────────────────── Customer ───────────────────────────
+
+model Customer {
+  phone     String   @id
+  name      String?
+  createdAt DateTime @default(now())
+
+  favorites Favorite[]
+  reviews   Review[]
+}
+
+model Favorite {
+  id            String   @id @default(cuid())
+  customerPhone String
+  customer      Customer @relation(fields: [customerPhone], references: [phone], onDelete: Cascade)
+  vendorPhone   String
+  vendor        Vendor   @relation(fields: [vendorPhone], references: [phone], onDelete: Cascade)
+  savedAt       DateTime @default(now())
+
+  @@unique([customerPhone, vendorPhone])
+}
+
+model Review {
+  id            String   @id @default(cuid())
+  vendorPhone   String
+  vendor        Vendor   @relation(fields: [vendorPhone], references: [phone], onDelete: Cascade)
+  customerPhone String
+  customer      Customer @relation(fields: [customerPhone], references: [phone], onDelete: Cascade)
+  rating        Int      // 1–5
+  comment       String?
+  createdAt     DateTime @default(now())
+
+  @@unique([vendorPhone, customerPhone]) // one review per customer per vendor
+}
+
+// ─────────────────────────── Municipal Admin ───────────────────────────
+
+model Admin {
+  id         String @id @default(cuid())
+  name       String
+  department String // e.g. "Town Vending Committee"
+  region     String // e.g. "Ward 42, Shivajinagar"
+  phone      String @unique // OTP login for admins too
+
+  broadcasts Broadcast[]
+  zones      VendingZone[]
+}
+
+// ─────────────────────────── Zones & Broadcasts ───────────────────────────
+
+model VendingZone {
+  id        String   @id @default(cuid())
+  name      String
+  type      String   // VENDING (green) | NO_VENDING (red)
+  region    String
+  polygon   String   // JSON string: [[lat,lng], …] — drawn by admins on the map
+  createdAt DateTime @default(now())
+  createdById String?
+  createdBy Admin?   @relation(fields: [createdById], references: [id])
+
+  vendors Vendor[]
+}
+
+model Broadcast {
+  id       String   @id @default(cuid())
+  title    String
+  message  String
+  audience String   @default("ALL_VENDORS") // ALL_VENDORS | ZONE:<zoneId> | CATEGORY:<cat>
+  channel  String   @default("PUSH_SMS")    // PUSH | SMS | PUSH_SMS
+  status   String   @default("QUEUED")      // QUEUED | SENT | FAILED
+  sentAt   DateTime?
+  createdAt DateTime @default(now())
+  sentById String?
+  sentBy   Admin?   @relation(fields: [sentById], references: [id])
+}
+
+// ─────────────────────────── Auth ───────────────────────────
+
+model OtpSession {
+  phone     String   @id
+  codeHash  String
+  role      String   // VENDOR | CUSTOMER | ADMIN
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
