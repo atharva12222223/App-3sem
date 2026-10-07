@@ -74,20 +74,26 @@ function DashboardInner() {
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-md space-y-4 px-4 py-6 pb-safe pt-safe">
-      <header className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-extrabold text-civic-900">Namaste, {vendor.name.split(" ")[0]} 🙏</h1>
-          <p className="text-sm font-semibold text-slate-500">+{vendor.phone}</p>
-        </div>
+      <div className="flex items-center justify-between">
+        <Link href="/" className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-extrabold text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50">
+          ← Back to Home / मुख्य पृष्ठ
+        </Link>
         <button
           onClick={() => {
             clearSession();
             router.replace("/vendor");
           }}
-          className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-slate-600 shadow"
+          className="rounded-xl bg-white px-3 py-1.5 text-xs font-bold text-slate-600 shadow-sm border border-slate-200 hover:bg-slate-50"
         >
           Logout ↩
         </button>
+      </div>
+
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-extrabold text-civic-900">Namaste, {vendor.name.split(" ")[0]} 🙏</h1>
+          <p className="text-sm font-semibold text-slate-500">+{vendor.phone}</p>
+        </div>
       </header>
 
       {vendor.verificationStatus === "PENDING" && (

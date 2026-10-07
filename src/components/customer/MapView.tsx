@@ -35,9 +35,12 @@ const vendorIcon = (icon: string) =>
 
 const userIcon = L.divIcon({
   className: "",
-  html: `<div style="width:22px;height:22px;border-radius:50%;background:#1d4ed8;border:4px solid #fff;box-shadow:0 0 0 3px rgba(29,78,216,.4);"></div>`,
-  iconSize: [22, 22],
-  iconAnchor: [11, 11],
+  html: `<div style="position:relative;width:32px;height:32px;display:flex;align-items:center;justify-content:center;">
+    <div style="position:absolute;width:32px;height:32px;border-radius:50%;background:rgba(37,99,235,0.35);animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite;"></div>
+    <div style="width:18px;height:18px;border-radius:50%;background:#2563eb;border:3px solid #ffffff;box-shadow:0 2px 6px rgba(0,0,0,0.4);position:relative;z-index:2;"></div>
+  </div>`,
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
 });
 
 function Recenter({ pos }: { pos: [number, number] | null }) {
@@ -46,6 +49,23 @@ function Recenter({ pos }: { pos: [number, number] | null }) {
     if (pos) map.setView(pos, 16);
   }, [pos, map]);
   return null;
+}
+
+function LocateControl({ userPos }: { userPos: [number, number] | null }) {
+  const map = useMap();
+  if (!userPos) return null;
+  return (
+    <div className="leaflet-bottom leaflet-right mb-5 mr-3 pointer-events-auto" style={{ zIndex: 999 }}>
+      <button
+        type="button"
+        title="My Live Location"
+        onClick={() => map.flyTo(userPos, 16, { duration: 1.2 })}
+        className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white shadow-xl border border-slate-200 text-lg hover:bg-slate-50 active:scale-90 transition-transform"
+      >
+        🎯
+      </button>
+    </div>
+  );
 }
 
 export function MapView({
@@ -70,7 +90,17 @@ export function MapView({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Recenter pos={focusVendor ?? userPos} />
-      {userPos && <Marker position={userPos} icon={userIcon} />}
+      <LocateControl userPos={userPos} />
+      {userPos && (
+        <Marker position={userPos} icon={userIcon}>
+          <Popup>
+            <div className="text-center py-1">
+              <strong className="text-blue-600 font-bold">📍 Your Live Location</strong>
+              <p className="text-xs text-slate-500">आप यहाँ हैं</p>
+            </div>
+          </Popup>
+        </Marker>
+      )}
       {zones.map((z) => (
         <Polygon
           key={z.id}

@@ -28,9 +28,12 @@ export default function CustomerHomePage() {
   const [loading, setLoading] = useState(true);
   const [locState, setLocState] = useState<"idle" | "granted" | "denied">("idle");
 
-  // Geolocation on mount
-  useEffect(() => {
-    if (!navigator.geolocation) return setLocState("denied");
+  const requestLiveLocation = useCallback(() => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      setLocState("denied");
+      return;
+    }
+    setLocState("idle");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setUserPos([pos.coords.latitude, pos.coords.longitude]);
@@ -40,6 +43,11 @@ export default function CustomerHomePage() {
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }, []);
+
+  // Geolocation on mount
+  useEffect(() => {
+    requestLiveLocation();
+  }, [requestLiveLocation]);
 
   const fetchVendors = useCallback(async () => {
     setLoading(true);
@@ -118,10 +126,31 @@ export default function CustomerHomePage() {
           dutyOnly={dutyOnly}
           onDutyOnlyChange={setDutyOnly}
         />
-        {locState === "denied" && (
-          <p className="rounded-lg bg-amber-50 p-2 text-xs font-semibold text-amber-800">
-            📵 Location off — showing all verified vendors. Enable location for distances.
-          </p>
+        {locState === "granted" && userPos ? (
+          <div className="flex items-center justify-between text-xs">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 font-bold text-blue-700 border border-blue-200">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+              </span>
+              Live GPS: {userPos[0].toFixed(3)}°, {userPos[1].toFixed(3)}°
+            </span>
+            <button
+              type="button"
+              onClick={requestLiveLocation}
+              className="text-xs font-bold text-blue-600 underline hover:text-blue-800"
+            >
+              🔄 Refresh GPS
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={requestLiveLocation}
+            className="w-full flex items-center justify-center gap-1.5 rounded-xl bg-blue-50 border border-blue-200 py-2 px-3 text-xs font-extrabold text-blue-700 hover:bg-blue-100 active:scale-98 transition"
+          >
+            📍 Tap to Enable Live Location / लाइव लोकेशन चालू करें
+          </button>
         )}
       </header>
 

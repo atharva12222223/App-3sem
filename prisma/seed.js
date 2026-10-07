@@ -68,28 +68,12 @@ async function main() {
       lastPingAt: new Date(),
       zoneId: ward.id,
     },
-    {
-      phone: "919800011122",
-      name: "Lakshmi Flower Stall",
-      nameVernacular: "லக்ஷ்மி பூ கடை",
-      category: "FLOWERS",
-      verificationStatus: "PENDING",
-      upiId: "9800011122@paytm",
-      lat: 12.9856,
-      lng: 77.6071,
-      dutyActive: false,
-      zoneId: ward.id,
-    },
-    {
-      phone: "919777788899",
-      name: "Imran Clothing Corner",
-      category: "CLOTHING",
-      verificationStatus: "PENDING",
-      lat: 12.9803,
-      lng: 77.6088,
-      dutyActive: false,
-    },
   ];
+
+  // Clean up any old pending demo vendors
+  await prisma.vendor.deleteMany({
+    where: { phone: { in: ["919800011122", "919777788899"] } },
+  });
 
   for (const v of vendors) {
     await prisma.vendor.upsert({ where: { phone: v.phone }, update: {}, create: v });

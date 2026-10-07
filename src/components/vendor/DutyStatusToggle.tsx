@@ -10,6 +10,7 @@ export function DutyStatusToggle({ initial }: { initial: boolean }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [lastPing, setLastPing] = useState<Date | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   async function ping(lat?: number, lng?: number) {
@@ -18,6 +19,7 @@ export function DutyStatusToggle({ initial }: { initial: boolean }) {
         "/api/vendors/me/status",
         { method: "POST", auth: true, body: { dutyActive: true, lat, lng } }
       );
+      if (lat && lng) setCoords({ lat, lng });
       setLastPing(new Date(res.vendor.lastPingAt));
     } catch {
       /* silent — next tick will retry */
@@ -30,24 +32,37 @@ export function DutyStatusToggle({ initial }: { initial: boolean }) {
     setBusy(true);
     try {
       if (next) {
-        // Turning ON: capture live GPS location (and refresh every 2 min)
-        await new Promise<void>((resolve) => {
-          if (!navigator.geolocation) return resolve();
-          navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-              await api("/api/vendors/me/status", {
-                method: "POST",
-                auth: true,
-                body: { dutyActive: true, lat: pos.coords.latitude, lng: pos.coords.longitude },
-              });
-              setLastPing(new Date());
-              resolve();
-            },
-            () => resolve(),
-            { enableHighAccuracy: true, timeout: 8000 }
-          );
-        });
-        if (!lastPing) {
+        let captured = false;
+        if (typeof window !== "undefined" && navigator.geolocation) {
+          try {
+            await new Promise<void>((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                  try {
+                    captured = true;
+                    setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+                    await api("/api/vendors/me/status", {
+                      method: "POST",
+                      auth: true,
+                      body: { dutyActive: true, lat: pos.coords.latitude, lng: pos.coords.longitude },
+                    });
+                    setLastPing(new Date());
+                    resolve();
+                  } catch (e) {
+                    reject(e);
+                  }
+                },
+                () => resolve(),
+                { enableHighAccuracy: true, timeout: 8000 }
+              );
+            });
+          } catch (e) {
+            setError((e as Error).message);
+            setBusy(false);
+            return;
+          }
+        }
+        if (!captured) {
           await api("/api/vendors/me/status", {
             method: "POST",
             auth: true,
@@ -71,6 +86,7 @@ export function DutyStatusToggle({ initial }: { initial: boolean }) {
         });
         if (intervalRef.current) clearInterval(intervalRef.current);
         setLastPing(null);
+        setCoords(null);
       }
       setActive(next);
     } catch (e) {
@@ -122,6 +138,11 @@ export function DutyStatusToggle({ initial }: { initial: boolean }) {
           ? `📍 Sharing live location${lastPing ? ` · updated ${lastPing.toLocaleTimeString()}` : ""}`
           : "Tap to start sharing your live location"}
       </p>
+      {active && coords && (
+        <p className="mt-1 text-center font-mono text-xs font-bold text-verified-700 bg-verified-50 py-1 px-3 rounded-full mx-auto w-fit">
+          🛰️ Live GPS: {coords.lat.toFixed(4)}° N, {coords.lng.toFixed(4)}° E
+        </p>
+      )}
       {error && (
         <p role="alert" className="mt-2 rounded-lg bg-red-100 p-3 text-center font-semibold text-red-800">
           ⚠️ {error}

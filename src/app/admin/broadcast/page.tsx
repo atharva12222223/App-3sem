@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { api, getSession } from "@/lib/api-client";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { BroadcastPanel, BroadcastRecord } from "@/components/admin/BroadcastPanel";
@@ -36,8 +37,22 @@ export default function AdminBroadcastPage() {
   }, [load]);
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl space-y-4 px-4 py-6">
-      <header>
+    <main className="mx-auto min-h-screen w-full max-w-6xl space-y-4 px-4 py-6 pb-safe pt-safe">
+      <header className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-extrabold text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50"
+          >
+            ← Back to Approvals
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-extrabold text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50"
+          >
+            🏠 Home
+          </Link>
+        </div>
         <h1 className="text-2xl font-extrabold text-civic-900">
           📢 Vendor Broadcast <span className="text-base font-semibold text-slate-500">/ सूचना प्रसारण</span>
         </h1>

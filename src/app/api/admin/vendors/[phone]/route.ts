@@ -52,3 +52,18 @@ export async function POST(
 
   return NextResponse.json({ ok: true });
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { phone: string } }
+) {
+  const session = authFromRequest(req, "ADMIN");
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  await prisma.vendor.delete({
+    where: { phone: params.phone },
+  });
+
+  return NextResponse.json({ ok: true });
+}
+

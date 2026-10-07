@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { api, clearSession, getSession } from "@/lib/api-client";
 import { OtpLogin } from "@/components/OtpLogin";
 import { AdminNav } from "@/components/admin/AdminNav";
@@ -46,6 +47,9 @@ export default function AdminDashboardPage() {
   if (!authed) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 py-8">
+        <Link href="/" className="text-sm font-bold text-slate-500 underline">
+          ← Back to Home / मुख्य पृष्ठ
+        </Link>
         <OtpLogin
           role="ADMIN"
           icon="🏛️"
@@ -60,7 +64,15 @@ export default function AdminDashboardPage() {
   return (
     <main className="mx-auto min-h-screen w-full max-w-6xl space-y-4 px-4 py-6 pb-safe pt-safe">
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-extrabold text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50"
+            >
+              ← Back to Home
+            </Link>
+          </div>
           <h1 className="text-2xl font-extrabold text-civic-900">🏛️ Town Vending Committee</h1>
           {admin && (
             <p className="text-sm font-semibold text-slate-500">

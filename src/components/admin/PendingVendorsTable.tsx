@@ -58,6 +58,23 @@ export function PendingVendorsTable({
     }
   }
 
+  async function remove(phone: string) {
+    if (!window.confirm("Are you sure you want to delete this vendor registration permanently?")) return;
+    setBusy(phone);
+    setError("");
+    try {
+      await api(`/api/admin/vendors/${phone}`, {
+        method: "DELETE",
+        auth: true,
+      });
+      onDecided();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(null);
+    }
+  }
+
   if (vendors.length === 0) {
     return (
       <div className="rounded-2xl bg-white p-10 text-center shadow">
@@ -124,7 +141,7 @@ export function PendingVendorsTable({
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex justify-end gap-2">
-                    <DecisionButtons phone={v.phone} busy={busy} decide={decide} />
+                    <DecisionButtons phone={v.phone} busy={busy} decide={decide} remove={remove} />
                   </div>
                 </td>
               </tr>
@@ -168,7 +185,7 @@ export function PendingVendorsTable({
               )}
             </div>
             <div className="mt-3 flex gap-2">
-              <DecisionButtons phone={v.phone} busy={busy} decide={decide} full />
+              <DecisionButtons phone={v.phone} busy={busy} decide={decide} remove={remove} full />
             </div>
           </div>
         ))}
@@ -181,11 +198,13 @@ function DecisionButtons({
   phone,
   busy,
   decide,
+  remove,
   full = false,
 }: {
   phone: string;
   busy: string | null;
   decide: (phone: string, action: "APPROVE" | "REJECT") => void;
+  remove: (phone: string) => void;
   full?: boolean;
 }) {
   return (
@@ -194,7 +213,7 @@ function DecisionButtons({
         type="button"
         onClick={() => decide(phone, "APPROVE")}
         disabled={busy === phone}
-        className={`${full ? "flex-1" : ""} rounded-xl bg-verified-500 px-4 py-2.5 text-sm font-extrabold text-white shadow hover:bg-verified-600 disabled:opacity-50`}
+        className={`${full ? "flex-1" : ""} rounded-xl bg-verified-500 px-3.5 py-2 text-xs font-extrabold text-white shadow hover:bg-verified-600 disabled:opacity-50`}
       >
         ✓ Approve
       </button>
@@ -202,9 +221,18 @@ function DecisionButtons({
         type="button"
         onClick={() => decide(phone, "REJECT")}
         disabled={busy === phone}
-        className={`${full ? "flex-1" : ""} rounded-xl bg-red-600 px-4 py-2.5 text-sm font-extrabold text-white shadow hover:bg-red-700 disabled:opacity-50`}
+        className={`${full ? "flex-1" : ""} rounded-xl bg-amber-500 px-3.5 py-2 text-xs font-extrabold text-white shadow hover:bg-amber-600 disabled:opacity-50`}
       >
         ✗ Reject
+      </button>
+      <button
+        type="button"
+        onClick={() => remove(phone)}
+        disabled={busy === phone}
+        className="rounded-xl bg-red-600 px-3 py-2 text-xs font-extrabold text-white shadow hover:bg-red-700 disabled:opacity-50"
+        title="Delete registration permanently"
+      >
+        🗑️
       </button>
     </>
   );

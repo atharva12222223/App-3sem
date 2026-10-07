@@ -42,10 +42,12 @@ export async function GET(req: NextRequest) {
           ? haversineKm(lat, lng, v.lat, v.lng)
           : null,
     }))
-    .filter((v) => !hasCoords || v.distanceKm == null || v.distanceKm <= radiusKm)
     .sort((a, b) => (a.distanceKm ?? 1e9) - (b.distanceKm ?? 1e9));
 
-  return NextResponse.json({ count: results.length, vendors: results });
+  const nearby = results.filter((v) => !hasCoords || v.distanceKm == null || v.distanceKm <= radiusKm);
+  const finalResults = nearby.length > 0 ? nearby : results;
+
+  return NextResponse.json({ count: finalResults.length, vendors: finalResults });
 }
 
 // POST /api/vendors — register a new vendor profile (requires VENDOR token)

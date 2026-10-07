@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { OtpLogin } from "@/components/OtpLogin";
 import { getSession } from "@/lib/api-client";
 
@@ -18,6 +19,9 @@ export default function CustomerLoginPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 py-8">
+      <Link href="/customer" className="text-sm font-bold text-slate-500 underline">
+        ← Back to Customer / वापस
+      </Link>
       <OtpLogin
         role="CUSTOMER"
         icon="📍"
