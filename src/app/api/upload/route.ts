@@ -4,7 +4,7 @@ import { randomUUID } from "crypto";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 
-const MAX_SIZE_MB = 5;
+const MAX_SIZE_MB = 12;
 const ALLOWED = ["image/jpeg", "image/png", "application/pdf"];
 
 // POST /api/upload — multipart form upload for KYC documents.

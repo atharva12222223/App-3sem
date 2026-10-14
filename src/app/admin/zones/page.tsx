@@ -40,7 +40,7 @@ export default function AdminZonesPage() {
   }, [load]);
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl space-y-4 px-4 py-6 pb-safe pt-safe">
+    <main className="mx-auto min-h-screen w-full max-w-6xl space-y-4 px-4 py-6 pb-24 pt-safe">
       <header className="space-y-2">
         <div className="flex items-center gap-2">
           <Link

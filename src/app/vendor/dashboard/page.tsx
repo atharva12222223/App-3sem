@@ -73,7 +73,7 @@ function DashboardInner() {
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-md space-y-4 px-4 py-6 pb-safe pt-safe">
+    <main className="mx-auto min-h-screen w-full max-w-md space-y-4 px-4 py-6 pb-24 pt-safe">
       <div className="flex items-center justify-between">
         <Link href="/" className="inline-flex items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 text-xs font-extrabold text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50">
           ← Back to Home / मुख्य पृष्ठ

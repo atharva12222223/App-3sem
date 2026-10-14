@@ -82,21 +82,46 @@ export function DigitalIdCard({ vendor }: { vendor: DigitalIdVendor }) {
               <canvas ref={canvasRef} className="h-[132px] w-[132px]" aria-label={`QR code linking to ${vendor.name}'s public profile`} />
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => canvasRef.current?.toBlob((b) => {
-              if (!b) return;
-              const url = URL.createObjectURL(b);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `${digitalId}-qr.png`;
-              a.click();
-              URL.revokeObjectURL(url);
-            })}
-            className="rounded-lg bg-white/20 px-3 py-2 text-xs font-bold backdrop-blur hover:bg-white/30"
-          >
-            ⬇️ Save QR (print & display)
-          </button>
+          <div className="flex flex-col gap-1.5 w-full">
+            <button
+              type="button"
+              onClick={() => canvasRef.current?.toBlob((b) => {
+                if (!b) return;
+                const url = URL.createObjectURL(b);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${digitalId}-qr.png`;
+                a.click();
+                URL.revokeObjectURL(url);
+              })}
+              className="w-full rounded-lg bg-white/20 py-1.5 px-2 text-center text-[11px] font-bold backdrop-blur hover:bg-white/30 active:scale-95 transition"
+            >
+              ⬇️ Save QR Code
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const shareData = {
+                  title: `${vendor.name} — Street Vendor Profile`,
+                  text: `Visit my street shop on Sadak Vyapar to view location, menu & pay via UPI!`,
+                  url: profileUrl,
+                };
+                if (navigator.share) {
+                  navigator.share(shareData).catch(() => {});
+                } else {
+                  window.open(
+                    `https://api.whatsapp.com/send?text=${encodeURIComponent(
+                      `Visit my shop ${vendor.name} on Sadak Vyapar: ${profileUrl}`
+                    )}`,
+                    "_blank"
+                  );
+                }
+              }}
+              className="w-full rounded-lg bg-green-500 py-1.5 px-2 text-center text-[11px] font-bold text-white shadow hover:bg-green-600 active:scale-95 transition"
+            >
+              💬 Share on WhatsApp
+            </button>
+          </div>
         </div>
       </div>
     </div>

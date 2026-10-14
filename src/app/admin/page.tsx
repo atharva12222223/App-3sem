@@ -62,7 +62,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl space-y-4 px-4 py-6 pb-safe pt-safe">
+    <main className="mx-auto min-h-screen w-full max-w-6xl space-y-4 px-4 py-6 pb-24 pt-safe">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
           <div className="flex items-center gap-3">

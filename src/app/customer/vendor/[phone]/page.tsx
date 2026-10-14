@@ -105,7 +105,7 @@ export default function VendorDetailPage() {
   const cat = categoryInfo(vendor.category);
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-lg space-y-4 px-4 py-4 pb-safe pt-safe">
+    <main className="mx-auto min-h-screen w-full max-w-lg space-y-4 px-4 py-4 pb-24 pt-safe">
       <Link href="/customer" className="inline-block text-sm font-bold text-civic-600 underline">
         ← Back to map / नक्शे पर वापस
       </Link>
@@ -160,11 +160,62 @@ export default function VendorDetailPage() {
           </p>
         )}
 
+        {/* Action bar: Directions, Call, Share */}
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {vendor.lat != null && vendor.lng != null ? (
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${vendor.lat},${vendor.lng}`}
+              target="_blank"
+              rel="noreferrer"
+              className="flex flex-col items-center justify-center rounded-xl bg-slate-100 p-2 text-xs font-bold text-slate-700 hover:bg-slate-200 active:scale-95 transition"
+            >
+              <span className="text-xl">🧭</span>
+              Directions
+            </a>
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-xl bg-slate-50 p-2 text-xs font-bold text-slate-400 opacity-60">
+              <span className="text-xl">🧭</span>
+              No GPS
+            </div>
+          )}
+          <a
+            href={`tel:+${vendor.phone}`}
+            className="flex flex-col items-center justify-center rounded-xl bg-slate-100 p-2 text-xs font-bold text-slate-700 hover:bg-slate-200 active:scale-95 transition"
+          >
+            <span className="text-xl">📞</span>
+            Call
+          </a>
+          <button
+            type="button"
+            onClick={() => {
+              const shareData = {
+                title: `${vendor.name} — Street Vendor`,
+                text: `Check out ${vendor.name} on Sadak Vyapar!`,
+                url: window.location.href,
+              };
+              if (navigator.share) {
+                navigator.share(shareData).catch(() => {});
+              } else {
+                window.open(
+                  `https://api.whatsapp.com/send?text=${encodeURIComponent(
+                    `Check out ${vendor.name} on Sadak Vyapar: ${window.location.href}`
+                  )}`,
+                  "_blank"
+                );
+              }
+            }}
+            className="flex flex-col items-center justify-center rounded-xl bg-green-50 p-2 text-xs font-bold text-green-700 hover:bg-green-100 active:scale-95 transition border border-green-200"
+          >
+            <span className="text-xl">💬</span>
+            Share
+          </button>
+        </div>
+
         <button
           type="button"
           onClick={toggleFavorite}
           disabled={favBusy || getSession()?.role !== "CUSTOMER"}
-          className={`mt-4 w-full rounded-xl border-2 py-3 font-extrabold transition ${
+          className={`mt-3 w-full rounded-xl border-2 py-3 font-extrabold transition ${
             isFavorite
               ? "border-amber-400 bg-amber-50 text-amber-700"
               : "border-slate-200 bg-white text-slate-700 hover:border-amber-400"

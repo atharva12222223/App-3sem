@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { IosInstallPrompt } from "@/components/IosInstallPrompt";
+import { AppInstallBanner } from "@/components/AppInstallBanner";
 
 const portals = [
   {
@@ -50,7 +50,7 @@ export default function LandingPage() {
         </p>
       </header>
 
-      <IosInstallPrompt />
+      <AppInstallBanner />
 
       <nav className="flex flex-col gap-4" aria-label="Choose your portal">
         {portals.map((p) => (

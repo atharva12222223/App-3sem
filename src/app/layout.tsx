@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { LanguageProvider } from "@/components/LanguageProvider";
+import { PwaRegister } from "@/components/PwaRegister";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 
 export const metadata: Metadata = {
   title: "Sadak Vyapar — Street Vendor Digital Registry",
@@ -9,7 +11,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "Sadak Vyapar",
   },
   icons: {
@@ -26,7 +28,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
-  themeColor: "#1e3a5f",
+  themeColor: "#0f172a",
 };
 
 export default function RootLayout({
@@ -36,8 +38,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <LanguageProvider>{children}</LanguageProvider>
+      <body className="pb-16 sm:pb-0">
+        <LanguageProvider>
+          <PwaRegister />
+          {children}
+          <MobileBottomNav />
+        </LanguageProvider>
       </body>
     </html>
   );

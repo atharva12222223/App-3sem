@@ -99,10 +99,25 @@ export function OtpLogin({ role, icon, title, subtitle, onLoggedIn }: Props) {
           <button
             type="submit"
             disabled={busy || phone.length !== 10}
-            className="w-full rounded-xl bg-civic-600 py-4 text-lg font-extrabold text-white shadow disabled:opacity-50"
+            className="w-full rounded-xl bg-civic-600 py-4 text-lg font-extrabold text-white shadow disabled:opacity-50 active:scale-98 transition"
           >
             {busy ? "Sending…" : "Send OTP →"}
           </button>
+
+          {/* Quick Demo Autofill */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (role === "VENDOR") setPhone("9876543210");
+                else if (role === "ADMIN") setPhone("9900011122");
+                else setPhone("9600012345");
+              }}
+              className="w-full rounded-xl bg-slate-100 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-200 active:scale-98 transition"
+            >
+              ⚡ Fill Demo {role === "VENDOR" ? "Vendor (Ramesh)" : role === "ADMIN" ? "Admin (Kavya)" : "Customer"}
+            </button>
+          </div>
         </form>
       ) : (
         <form
@@ -128,9 +143,13 @@ export function OtpLogin({ role, icon, title, subtitle, onLoggedIn }: Props) {
             className="w-full rounded-xl border-2 border-slate-300 px-4 py-3 text-center text-2xl font-bold tracking-[0.5em] focus:border-civic-600 focus:outline-none"
           />
           {devHint && (
-            <p className="rounded-lg bg-amber-50 p-3 text-center text-sm font-semibold text-amber-800">
-              {devHint}
-            </p>
+            <button
+              type="button"
+              onClick={() => setOtp("123456")}
+              className="w-full rounded-xl bg-amber-50 p-3 text-center text-xs font-bold text-amber-900 border border-amber-300 hover:bg-amber-100 active:scale-98 transition"
+            >
+              ⚡ Tap to autofill demo code: <strong>123456</strong>
+            </button>
           )}
           {error && (
             <p role="alert" className="rounded-lg bg-red-100 p-3 font-semibold text-red-800">
