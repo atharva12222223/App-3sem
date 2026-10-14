@@ -38,7 +38,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="pb-16 sm:pb-0">
+      <body>
         <LanguageProvider>
           <PwaRegister />
           {children}

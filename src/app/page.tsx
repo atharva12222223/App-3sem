@@ -29,7 +29,7 @@ const portals = [
 
 export default function LandingPage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg flex-col gap-6 px-4 py-6 pb-safe pt-safe">
+    <main className="mx-auto flex min-h-screen max-w-lg flex-col gap-6 px-4 pb-24 pt-safe">
       <header className="text-center pt-2">
         <div className="mx-auto mb-4 relative h-20 w-20 overflow-hidden rounded-[22%] shadow-xl border-2 border-white/80 ring-1 ring-slate-900/10 transition-transform active:scale-95">
           <Image

@@ -58,7 +58,7 @@ function DashboardInner() {
   }
 
   // New vendor (or ?register=1) → registration flow
-  if (!vendor || params.get("register") === "1" && !vendor) {
+  if (!vendor) {
     return (
       <main className="mx-auto min-h-screen w-full max-w-md px-4 py-8">
         <div className="rounded-3xl bg-white p-6 shadow-xl">
